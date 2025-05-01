@@ -8,63 +8,50 @@ import sys
 
 # Configuración de página Streamlit
 st.set_page_config(
-    page_title="Detección de Objetos en Tiempo Real",
-    page_icon="🔍",
+    page_title="Oráculo del Castillo – Visión Mística de Objetos",
+    page_icon="🧙‍♂️",
     layout="wide"
 )
 
 # Estilo medieval
 st.markdown("""
     <style>
-        body {
-            background-color: #f3eac2;
-            font-family: 'Georgia', serif;
-        }
-        .stApp {
-            background-image: url('https://cdn.pixabay.com/photo/2016/11/23/14/45/castle-1852978_1280.jpg');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: #3e1f47;
-        }
-        .stTitle, .stMarkdown h1, .stMarkdown h2 {
-            color: #5e3a73;
-            text-shadow: 1px 1px 2px #c8b09f;
-        }
-        .stSidebar {
-            background: linear-gradient(to bottom, #5e3a73, #402452);
-            color: white;
-        }
-        .stSidebar h1, .stSidebar h2, .stSidebar h3 {
-            color: #f3eac2;
-        }
-        .stButton>button {
-            background-color: #8b5fbf;
-            color: #fff;
-            border-radius: 10px;
-            font-size: 16px;
-            font-family: 'Georgia', serif;
-        }
-        .stDataFrame, .stDataFrame table {
-            background-color: #fdf6e3;
-            border: 2px solid #8b5fbf;
-            border-radius: 8px;
-        }
-        .block-container {
-            padding-top: 2rem;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem;
-        }
-        .element-container label, .css-1cpxqw2 {
-            font-family: 'Georgia', serif;
-            font-size: 16px;
-        }
+    @import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
+
+    html, body, [class*="css"] {
+        background-color: #1a1a1a;
+        color: #e0d8c3;
+        font-family: 'UnifrakturCook', cursive;
+    }
+
+    .stButton>button {
+        background-color: #5b3e1d;
+        color: white;
+        border-radius: 12px;
+        border: 2px solid #a67c52;
+        font-size: 18px;
+        padding: 0.5em 1em;
+    }
+
+    .stSidebar {
+        background-color: #2f2f2f;
+    }
+
+    .st-bf, .st-cf {
+        background-color: #2f2f2f !important;
+    }
+
+    h1, h2, h3 {
+        color: #f8f3dc !important;
+    }
+
+    .css-1v0mbdj p {
+        font-family: 'UnifrakturCook', cursive;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# Función para cargar el modelo YOLOv5 de manera compatible con versiones anteriores de PyTorch
+# Función para cargar el modelo YOLOv5
 @st.cache_resource
 def load_yolov5_model(model_path='yolov5s.pt'):
     try:
@@ -76,8 +63,8 @@ def load_yolov5_model(model_path='yolov5s.pt'):
             try:
                 model = yolov5.load(model_path)
                 return model
-            except Exception as e:
-                st.warning(f"Intentando método alternativo de carga...")
+            except:
+                st.warning("Intentando método alternativo de carga...")
                 current_dir = os.path.dirname(os.path.abspath(__file__))
                 if current_dir not in sys.path:
                     sys.path.append(current_dir)
@@ -86,56 +73,43 @@ def load_yolov5_model(model_path='yolov5s.pt'):
                 return model
     except Exception as e:
         st.error(f"❌ Error al cargar el modelo: {str(e)}")
-        st.info("""
-        Recomendaciones:
-        1. Instalar una versión compatible de PyTorch y YOLOv5:
-           ```
-           pip install torch==1.12.0 torchvision==0.13.0
-           pip install yolov5==7.0.9
-           ```
-        2. Asegúrate de tener el archivo del modelo en la ubicación correcta
-        3. Si el problema persiste, intenta descargar el modelo directamente de torch hub
-        """)
         return None
 
-# Título y descripción de la aplicación
-st.title("🔍 Detección de Objetos en Imágenes")
-st.markdown("## 🧙‍♂️🔮 Bienvenido al Salón del Vidente del Castillo")
+# Título y bienvenida
+st.title("🔮 Oráculo del Castillo – Visión Mística de Objetos")
 st.markdown("""
-Aquí podrás examinar objetos en imágenes con la magia del orbe encantado (YOLOv5). Los sabios del reino te asistirán en la detección de amenazas o tesoros ocultos.
+¡Bienvenido, viajero del reino! 📜<br>
+Convoca el hechizo de visión profunda para revelar las entidades ocultas en tus imágenes.  
+Ajusta los pergaminos del costado para mejorar la precisión de tus visiones.
+""", unsafe_allow_html=True)
 
----
-""")
-
-# Cargar el modelo
-with st.spinner("Cargando modelo YOLOv5..."):
+# Cargar modelo
+with st.spinner("🧙‍♂️ Invocando el poder de YOLOv5..."):
     model = load_yolov5_model()
 
 if model:
-    st.sidebar.title("⚙️ Parámetros del Orbe")
+    st.sidebar.title("🧪 Parámetros del hechizo")
+
     with st.sidebar:
-        st.subheader('Configuración de detección')
-        model.conf = st.slider('Confianza mínima', 0.0, 1.0, 0.25, 0.01)
-        model.iou = st.slider('Umbral IoU', 0.0, 1.0, 0.45, 0.01)
+        model.conf = st.slider('🧠 Confianza mínima', 0.0, 1.0, 0.25, 0.01)
+        model.iou = st.slider('🎯 Umbral IoU', 0.0, 1.0, 0.45, 0.01)
         st.caption(f"Confianza: {model.conf:.2f} | IoU: {model.iou:.2f}")
-        st.subheader('Opciones avanzadas')
         try:
-            model.agnostic = st.checkbox('NMS class-agnostic', False)
-            model.multi_label = st.checkbox('Múltiples etiquetas por caja', False)
-            model.max_det = st.number_input('Detecciones máximas', 10, 2000, 1000, 10)
+            model.agnostic = st.checkbox('🔄 NMS sin clase', False)
+            model.multi_label = st.checkbox('🏷️ Etiquetas múltiples', False)
+            model.max_det = st.number_input('🧮 Máximas detecciones', 10, 2000, 1000, 10)
         except:
-            st.warning("Algunas opciones avanzadas no están disponibles con esta configuración")
+            st.warning("Algunas opciones avanzadas no están disponibles.")
 
     main_container = st.container()
-
     with main_container:
-        picture = st.camera_input("📸 Capturar imagen con el orbe", key="camera")
+        picture = st.camera_input("📸 Captura tu visión mágica")
 
         if picture:
             bytes_data = picture.getvalue()
             cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
 
-            with st.spinner("🔍 Consultando la visión del orbe mágico..."):
+            with st.spinner("🔍 Consultando el oráculo..."):
                 try:
                     results = model(cv2_img)
                 except Exception as e:
@@ -149,23 +123,19 @@ if model:
                 categories = predictions[:, 5]
 
                 col1, col2 = st.columns(2)
-
                 with col1:
-                    st.subheader("🧾 Resultados de la visión")
+                    st.subheader("🖼️ Visión revelada")
                     results.render()
                     st.image(cv2_img, channels='BGR', use_column_width=True)
 
                 with col2:
-                    st.subheader("📜 Objetos detectados")
-
+                    st.subheader("📜 Registro de criaturas y artefactos")
                     label_names = model.names
                     category_count = {}
+
                     for category in categories:
                         category_idx = int(category.item()) if hasattr(category, 'item') else int(category)
-                        if category_idx in category_count:
-                            category_count[category_idx] += 1
-                        else:
-                            category_count[category_idx] = 1
+                        category_count[category_idx] = category_count.get(category_idx, 0) + 1
 
                     data = []
                     for category, count in category_count.items():
@@ -182,17 +152,14 @@ if model:
                         st.dataframe(df, use_container_width=True)
                         st.bar_chart(df.set_index('Categoría')['Cantidad'])
                     else:
-                        st.info("No se detectaron objetos con los parámetros actuales.")
-                        st.caption("Prueba a reducir el umbral de confianza en la barra lateral.")
+                        st.info("⚠️ No se detectaron objetos. Ajusta los valores mágicos en la barra lateral.")
             except Exception as e:
-                st.error(f"Error al procesar los resultados: {str(e)}")
+                st.error(f"Error al procesar resultados: {str(e)}")
                 st.stop()
 else:
-    st.error("No se pudo cargar el modelo. Por favor verifica las dependencias e inténtalo nuevamente.")
-    st.stop()
+    st.error("⚠️ No se pudo cargar el modelo. Asegúrate de que todos los hechizos (dependencias) estén instalados.")
 
-# Pie de página
+# Pie de página medieval
 st.markdown("---")
-st.caption("""
-**Acerca de la aplicación**: Esta aplicación utiliza la magia del modelo YOLOv5 para detectar objetos en tiempo real. Desarrollada por los alquimistas del reino usando Streamlit y PyTorch.
-""")
+st.caption("🏰 Desarrollado por el gremio de alquimistas digitales. YOLOv5 y Streamlit como grimorios principales.")
+
